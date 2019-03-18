@@ -1,0 +1,16 @@
+name: GlobalClient
+main: de.cubeside.connection.ConnectionPlugin
+version: 0.0.1
+description: GlobalClient
+api-version: 1.13
+authors:
+  - Brokkonaut
+commands:
+  globalclientreload:
+    description: Reload from the config
+    usage: /<command>
+    permission: globalclient.reload
+permissions:
+  globalclient.reload:
+    description: Reload the config
+    default: op

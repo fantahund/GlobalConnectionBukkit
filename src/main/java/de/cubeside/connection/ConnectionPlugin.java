@@ -9,7 +9,12 @@ public class ConnectionPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        globalClient = new GlobalClientBukkit(this, null, 0, null, null);
+        saveDefaultConfig();
+        String account = getConfig().getString("client.account");
+        String password = getConfig().getString("client.password");
+        String host = getConfig().getString("server.host");
+        int port = getConfig().getInt("server.port");
+        globalClient = new GlobalClientBukkit(this, host, port, account, password);
         messageAPI = new PlayerMessageImplementation(this);
         getServer().getServicesManager().register(ConnectionAPI.class, globalClient, this, ServicePriority.Normal);
         getServer().getServicesManager().register(PlayerMessageAPI.class, messageAPI, this, ServicePriority.Normal);
