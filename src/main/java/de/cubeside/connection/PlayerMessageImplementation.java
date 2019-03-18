@@ -44,8 +44,9 @@ class PlayerMessageImplementation implements PlayerMessageAPI, Listener {
                             String message = dis.readUTF();
                             player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(message));
                         } else if (type == 4) {
-                            String title = dis.readUTF();
-                            String subtitle = dis.readUTF();
+                            int flags = dis.readByte();
+                            String title = ((flags & 1) != 0) ? dis.readUTF() : null;
+                            String subtitle = ((flags & 2) != 0) ? dis.readUTF() : null;
                             int fadeInTicks = dis.readInt();
                             int durationTicks = dis.readInt();
                             int fadeOutTicks = dis.readInt();
@@ -119,8 +120,14 @@ class PlayerMessageImplementation implements PlayerMessageAPI, Listener {
         DataOutputStream dos = new DataOutputStream(baos);
         try {
             dos.writeByte(4);
-            dos.writeUTF(title);
-            dos.writeUTF(subtitle);
+            int flags = (title != null ? 1 : 0) | (subtitle != null ? 2 : 0);
+            dos.writeByte(flags);
+            if (title != null) {
+                dos.writeUTF(title);
+            }
+            if (subtitle != null) {
+                dos.writeUTF(subtitle);
+            }
             dos.writeInt(fadeInTicks);
             dos.writeInt(durationTicks);
             dos.writeInt(fadeOutTicks);
