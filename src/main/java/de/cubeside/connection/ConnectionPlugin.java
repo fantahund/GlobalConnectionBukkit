@@ -24,8 +24,9 @@ public class ConnectionPlugin extends JavaPlugin {
     public void onDisable() {
         if (globalClient != null) {
             globalClient.shutdown();
-            globalClient = null;
         }
+        globalClient = null;
+        messageAPI = null;
     }
 
     public ConnectionAPI getConnectionAPI() {
