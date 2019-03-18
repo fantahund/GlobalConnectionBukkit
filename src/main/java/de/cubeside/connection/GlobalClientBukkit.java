@@ -1,5 +1,6 @@
 package de.cubeside.connection;
 
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -12,6 +13,9 @@ class GlobalClientBukkit extends GlobalClient implements Listener {
         super(host, port, account, password, false);
         plugin = connectionPlugin;
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
+        for (Player p : connectionPlugin.getServer().getOnlinePlayers()) {
+            onPlayerOnline(p.getUniqueId(), p.getName(), System.currentTimeMillis());
+        }
         startThread();
     }
 

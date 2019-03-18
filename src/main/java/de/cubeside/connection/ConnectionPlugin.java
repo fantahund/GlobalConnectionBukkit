@@ -1,5 +1,7 @@
 package de.cubeside.connection;
 
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -27,6 +29,21 @@ public class ConnectionPlugin extends JavaPlugin {
         }
         globalClient = null;
         messageAPI = null;
+    }
+
+    @Override
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (!sender.hasPermission("globalclient.reload")) {
+            return false;
+        }
+        reinitialize();
+        return true;
+    }
+
+    private void reinitialize() {
+        onDisable();
+        reloadConfig();
+        onEnable();
     }
 
     public ConnectionAPI getConnectionAPI() {
