@@ -71,6 +71,10 @@ class PlayerMessageImplementation implements PlayerMessageAPI, Listener {
             throw new Error("impossible");
         }
         player.sendData(CHANNEL, baos.toByteArray());
+        Player p = plugin.getServer().getPlayer(player.getUniqueId());
+        if (p != null) {
+            p.sendMessage(message);
+        }
     }
 
     @Override
@@ -85,6 +89,10 @@ class PlayerMessageImplementation implements PlayerMessageAPI, Listener {
             throw new Error("impossible");
         }
         player.sendData(CHANNEL, baos.toByteArray());
+        Player p = plugin.getServer().getPlayer(player.getUniqueId());
+        if (p != null) {
+            p.spigot().sendMessage(message);
+        }
     }
 
     @Override
@@ -99,6 +107,10 @@ class PlayerMessageImplementation implements PlayerMessageAPI, Listener {
             throw new Error("impossible");
         }
         player.sendData(CHANNEL, baos.toByteArray());
+        Player p = plugin.getServer().getPlayer(player.getUniqueId());
+        if (p != null) {
+            p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(message));
+        }
     }
 
     @Override
@@ -117,6 +129,10 @@ class PlayerMessageImplementation implements PlayerMessageAPI, Listener {
             throw new Error("impossible");
         }
         player.sendData(CHANNEL, baos.toByteArray());
+        Player p = plugin.getServer().getPlayer(player.getUniqueId());
+        if (p != null) {
+            p.sendTitle(title, subtitle, fadeInTicks, durationTicks, fadeOutTicks);
+        }
     }
 
 }
