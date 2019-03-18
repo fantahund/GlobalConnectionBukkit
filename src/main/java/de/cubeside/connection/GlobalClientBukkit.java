@@ -10,7 +10,7 @@ class GlobalClientBukkit extends GlobalClient implements Listener {
     private final ConnectionPlugin plugin;
 
     public GlobalClientBukkit(ConnectionPlugin connectionPlugin, String host, int port, String account, String password) {
-        super(host, port, account, password, false);
+        super(host, port, account, password, false, connectionPlugin.getLogger());
         plugin = connectionPlugin;
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
         for (Player p : connectionPlugin.getServer().getOnlinePlayers()) {
