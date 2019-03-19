@@ -1,5 +1,7 @@
-package de.cubeside.connection;
+package de.cubeside.connection.event;
 
+import de.cubeside.connection.GlobalPlayer;
+import de.cubeside.connection.GlobalServer;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import org.bukkit.event.Event;

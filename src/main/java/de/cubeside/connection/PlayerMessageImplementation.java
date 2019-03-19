@@ -1,5 +1,6 @@
 package de.cubeside.connection;
 
+import de.cubeside.connection.event.GlobalDataEvent;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

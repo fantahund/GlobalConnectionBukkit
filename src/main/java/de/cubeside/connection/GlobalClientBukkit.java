@@ -1,5 +1,10 @@
 package de.cubeside.connection;
 
+import de.cubeside.connection.event.GlobalDataEvent;
+import de.cubeside.connection.event.GlobalPlayerDisconnectedEvent;
+import de.cubeside.connection.event.GlobalPlayerJoinedEvent;
+import de.cubeside.connection.event.GlobalServerConnectedEvent;
+import de.cubeside.connection.event.GlobalServerDisconnectedEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -37,5 +42,25 @@ class GlobalClientBukkit extends GlobalClient implements Listener {
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e) {
         onPlayerOffline(e.getPlayer().getUniqueId());
+    }
+
+    @Override
+    protected void onPlayerJoined(GlobalServer server, GlobalPlayer player, boolean joinedTheNetwork) {
+        plugin.getServer().getPluginManager().callEvent(new GlobalPlayerJoinedEvent(server, player, joinedTheNetwork));
+    }
+
+    @Override
+    protected void onPlayerDisconnected(GlobalServer server, GlobalPlayer player, boolean leftTheNetwork) {
+        plugin.getServer().getPluginManager().callEvent(new GlobalPlayerDisconnectedEvent(server, player, leftTheNetwork));
+    }
+
+    @Override
+    protected void onServerConnected(GlobalServer server) {
+        plugin.getServer().getPluginManager().callEvent(new GlobalServerConnectedEvent(server));
+    }
+
+    @Override
+    protected void onServerDisconnected(GlobalServer server) {
+        plugin.getServer().getPluginManager().callEvent(new GlobalServerDisconnectedEvent(server));
     }
 }
