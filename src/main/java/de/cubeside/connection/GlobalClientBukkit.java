@@ -13,6 +13,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 class GlobalClientBukkit extends GlobalClient implements Listener {
     private final ConnectionPlugin plugin;
+    private boolean stopping;
 
     public GlobalClientBukkit(ConnectionPlugin connectionPlugin, String host, int port, String account, String password) {
         super(host, port, account, password, false, connectionPlugin.getLogger());
@@ -26,7 +27,11 @@ class GlobalClientBukkit extends GlobalClient implements Listener {
 
     @Override
     protected void runInMainThread(Runnable r) {
-        plugin.getServer().getScheduler().runTask(plugin, r);
+        if (stopping) {
+            r.run();
+        } else {
+            plugin.getServer().getScheduler().runTask(plugin, r);
+        }
     }
 
     @Override
@@ -62,5 +67,11 @@ class GlobalClientBukkit extends GlobalClient implements Listener {
     @Override
     protected void onServerDisconnected(GlobalServer server) {
         plugin.getServer().getPluginManager().callEvent(new GlobalServerDisconnectedEvent(server));
+    }
+
+    @Override
+    public void shutdown() {
+        this.stopping = true;
+        super.shutdown();
     }
 }
