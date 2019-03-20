@@ -6,7 +6,7 @@ import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class ConnectionPlugin extends JavaPlugin {
-    private GlobalClient globalClient;
+    private GlobalClientBukkit globalClient;
     private PlayerMessageAPI messageAPI;
 
     @Override
@@ -24,7 +24,14 @@ public class ConnectionPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        disable(true);
+    }
+
+    private void disable(boolean serverShutdown) {
         if (globalClient != null) {
+            if (serverShutdown) {
+                globalClient.onServerStop();
+            }
             globalClient.shutdown();
         }
         globalClient = null;
@@ -41,7 +48,7 @@ public class ConnectionPlugin extends JavaPlugin {
     }
 
     private void reinitialize() {
-        onDisable();
+        disable(false);
         reloadConfig();
         onEnable();
     }
