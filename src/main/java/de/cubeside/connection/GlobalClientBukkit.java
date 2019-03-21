@@ -15,11 +15,10 @@ class GlobalClientBukkit extends GlobalClient implements Listener {
     private final GlobalClientPlugin plugin;
     private boolean stoppingServer;
 
-    public GlobalClientBukkit(GlobalClientPlugin connectionPlugin, String host, int port, String account, String password) {
+    public GlobalClientBukkit(GlobalClientPlugin connectionPlugin) {
         super(connectionPlugin.getLogger());
         plugin = connectionPlugin;
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
-        setServer(host, port, account, password);
     }
 
     @Override
@@ -72,7 +71,9 @@ class GlobalClientBukkit extends GlobalClient implements Listener {
         plugin.getServer().getPluginManager().callEvent(new GlobalServerDisconnectedEvent(server));
     }
 
-    protected void onServerStop() {
+    @Override
+    public void shutdown() {
         this.stoppingServer = true;
+        super.shutdown();
     }
 }

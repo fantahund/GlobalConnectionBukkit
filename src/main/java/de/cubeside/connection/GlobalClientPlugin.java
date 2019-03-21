@@ -12,11 +12,8 @@ public class GlobalClientPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         saveDefaultConfig();
-        String account = getConfig().getString("client.account");
-        String password = getConfig().getString("client.password");
-        String host = getConfig().getString("server.host");
-        int port = getConfig().getInt("server.port");
-        globalClient = new GlobalClientBukkit(this, host, port, account, password);
+        globalClient = new GlobalClientBukkit(this);
+        reconnectClient();
         messageAPI = new PlayerMessageImplementation(this);
         getServer().getServicesManager().register(ConnectionAPI.class, globalClient, this, ServicePriority.Normal);
         getServer().getServicesManager().register(PlayerMessageAPI.class, messageAPI, this, ServicePriority.Normal);
@@ -25,7 +22,6 @@ public class GlobalClientPlugin extends JavaPlugin {
     @Override
     public void onDisable() {
         if (globalClient != null) {
-            globalClient.onServerStop();
             globalClient.shutdown();
         }
         globalClient = null;
@@ -38,12 +34,16 @@ public class GlobalClientPlugin extends JavaPlugin {
             return false;
         }
         reloadConfig();
+        reconnectClient();
+        return true;
+    }
+
+    public void reconnectClient() {
         String account = getConfig().getString("client.account");
         String password = getConfig().getString("client.password");
         String host = getConfig().getString("server.host");
         int port = getConfig().getInt("server.port");
         globalClient.setServer(host, port, account, password);
-        return true;
     }
 
     public ConnectionAPI getConnectionAPI() {
