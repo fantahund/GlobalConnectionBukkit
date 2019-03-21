@@ -16,11 +16,11 @@ import org.bukkit.event.Listener;
 
 class PlayerMessageImplementation implements PlayerMessageAPI, Listener {
 
-    private ConnectionPlugin plugin;
+    private GlobalClientPlugin plugin;
 
     private final static String CHANNEL = "GlobalClient.chat";
 
-    public PlayerMessageImplementation(ConnectionPlugin plugin) {
+    public PlayerMessageImplementation(GlobalClientPlugin plugin) {
         this.plugin = plugin;
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }

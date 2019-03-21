@@ -12,15 +12,20 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 class GlobalClientBukkit extends GlobalClient implements Listener {
-    private final ConnectionPlugin plugin;
+    private final GlobalClientPlugin plugin;
     private boolean stoppingServer;
 
-    public GlobalClientBukkit(ConnectionPlugin connectionPlugin, String host, int port, String account, String password) {
-        super(host, port, account, password, false, connectionPlugin.getLogger());
+    public GlobalClientBukkit(GlobalClientPlugin connectionPlugin, String host, int port, String account, String password) {
+        super(connectionPlugin.getLogger());
         plugin = connectionPlugin;
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
-        startThread();
-        for (Player p : connectionPlugin.getServer().getOnlinePlayers()) {
+        setServer(host, port, account, password);
+    }
+
+    @Override
+    public void setServer(String host, int port, String account, String password) {
+        super.setServer(host, port, account, password);
+        for (Player p : plugin.getServer().getOnlinePlayers()) {
             onPlayerOnline(p.getUniqueId(), p.getName(), System.currentTimeMillis());
         }
     }

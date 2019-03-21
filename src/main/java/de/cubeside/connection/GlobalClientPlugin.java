@@ -5,7 +5,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class ConnectionPlugin extends JavaPlugin {
+public class GlobalClientPlugin extends JavaPlugin {
     private GlobalClientBukkit globalClient;
     private PlayerMessageAPI messageAPI;
 
@@ -24,14 +24,8 @@ public class ConnectionPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        disable(true);
-    }
-
-    private void disable(boolean serverShutdown) {
         if (globalClient != null) {
-            if (serverShutdown) {
-                globalClient.onServerStop();
-            }
+            globalClient.onServerStop();
             globalClient.shutdown();
         }
         globalClient = null;
@@ -43,14 +37,13 @@ public class ConnectionPlugin extends JavaPlugin {
         if (!sender.hasPermission("globalclient.reload")) {
             return false;
         }
-        reinitialize();
-        return true;
-    }
-
-    private void reinitialize() {
-        disable(false);
         reloadConfig();
-        onEnable();
+        String account = getConfig().getString("client.account");
+        String password = getConfig().getString("client.password");
+        String host = getConfig().getString("server.host");
+        int port = getConfig().getInt("server.port");
+        globalClient.setServer(host, port, account, password);
+        return true;
     }
 
     public ConnectionAPI getConnectionAPI() {
