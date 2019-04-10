@@ -1,7 +1,9 @@
 package de.cubeside.connection;
 
+import de.cubeside.connection.util.GlobalLocation;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -12,6 +14,7 @@ public class GlobalClientPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         saveDefaultConfig();
+        ConfigurationSerialization.registerClass(GlobalLocation.class);
         globalClient = new GlobalClientBukkit(this);
         reconnectClient();
         messageAPI = new PlayerMessageImplementation(this);
