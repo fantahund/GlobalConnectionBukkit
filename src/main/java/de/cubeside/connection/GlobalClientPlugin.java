@@ -10,6 +10,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class GlobalClientPlugin extends JavaPlugin {
     private GlobalClientBukkit globalClient;
     private PlayerMessageAPI messageAPI;
+    private PlayerPropertiesAPI propertiesAPI;
 
     @Override
     public void onEnable() {
@@ -17,9 +18,13 @@ public class GlobalClientPlugin extends JavaPlugin {
         ConfigurationSerialization.registerClass(GlobalLocation.class);
         globalClient = new GlobalClientBukkit(this);
         reconnectClient();
-        messageAPI = new PlayerMessageImplementation(this);
         getServer().getServicesManager().register(ConnectionAPI.class, globalClient, this, ServicePriority.Normal);
+
+        messageAPI = new PlayerMessageImplementation(this);
         getServer().getServicesManager().register(PlayerMessageAPI.class, messageAPI, this, ServicePriority.Normal);
+
+        propertiesAPI = new PlayerPropertiesImplementation(this);
+        getServer().getServicesManager().register(PlayerPropertiesAPI.class, propertiesAPI, this, ServicePriority.Normal);
     }
 
     @Override
@@ -29,6 +34,7 @@ public class GlobalClientPlugin extends JavaPlugin {
         }
         globalClient = null;
         messageAPI = null;
+        propertiesAPI = null;
     }
 
     @Override
@@ -55,5 +61,9 @@ public class GlobalClientPlugin extends JavaPlugin {
 
     public PlayerMessageAPI getMessageAPI() {
         return messageAPI;
+    }
+
+    public PlayerPropertiesAPI getPlayerPropertiesAPI() {
+        return propertiesAPI;
     }
 }
