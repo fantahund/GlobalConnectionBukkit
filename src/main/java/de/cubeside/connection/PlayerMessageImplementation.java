@@ -16,6 +16,11 @@ import org.bukkit.event.Listener;
 
 class PlayerMessageImplementation implements PlayerMessageAPI, Listener {
 
+    private final static int MESSAGE_CHAT = 1;
+    private final static int MESSAGE_CHAT_COMPONENTS = 2;
+    private final static int MESSAGE_ACTION_BAR = 3;
+    private final static int MESSAGE_TITLE = 4;
+
     private GlobalClientPlugin plugin;
 
     private final static String CHANNEL = "GlobalClient.chat";
@@ -26,7 +31,7 @@ class PlayerMessageImplementation implements PlayerMessageAPI, Listener {
     }
 
     @EventHandler
-    public void onGlobalDataEvent(GlobalDataEvent e) {
+    public void onGlobalData(GlobalDataEvent e) {
         if (e.getChannel().equals(CHANNEL)) {
             DataInputStream dis = new DataInputStream(e.getData());
             try {
@@ -35,16 +40,16 @@ class PlayerMessageImplementation implements PlayerMessageAPI, Listener {
                     Player player = plugin.getServer().getPlayer(target.getUniqueId());
                     if (player != null) {
                         int type = dis.readByte();
-                        if (type == 1) {
+                        if (type == MESSAGE_CHAT) {
                             String message = dis.readUTF();
                             player.sendMessage(message);
-                        } else if (type == 2) {
+                        } else if (type == MESSAGE_CHAT_COMPONENTS) {
                             BaseComponent[] message = ComponentSerializer.parse(dis.readUTF());
                             player.spigot().sendMessage(message);
-                        } else if (type == 3) {
+                        } else if (type == MESSAGE_ACTION_BAR) {
                             String message = dis.readUTF();
                             player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(message));
-                        } else if (type == 4) {
+                        } else if (type == MESSAGE_TITLE) {
                             int flags = dis.readByte();
                             String title = ((flags & 1) != 0) ? dis.readUTF() : null;
                             String subtitle = ((flags & 2) != 0) ? dis.readUTF() : null;
@@ -66,7 +71,7 @@ class PlayerMessageImplementation implements PlayerMessageAPI, Listener {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(baos);
         try {
-            dos.writeByte(1);
+            dos.writeByte(MESSAGE_CHAT);
             dos.writeUTF(message);
             dos.close();
         } catch (IOException ex) {
@@ -84,7 +89,7 @@ class PlayerMessageImplementation implements PlayerMessageAPI, Listener {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(baos);
         try {
-            dos.writeByte(2);
+            dos.writeByte(MESSAGE_CHAT_COMPONENTS);
             dos.writeUTF(ComponentSerializer.toString(message));
             dos.close();
         } catch (IOException ex) {
@@ -102,7 +107,7 @@ class PlayerMessageImplementation implements PlayerMessageAPI, Listener {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(baos);
         try {
-            dos.writeByte(3);
+            dos.writeByte(MESSAGE_ACTION_BAR);
             dos.writeUTF(message);
             dos.close();
         } catch (IOException ex) {
@@ -120,7 +125,7 @@ class PlayerMessageImplementation implements PlayerMessageAPI, Listener {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(baos);
         try {
-            dos.writeByte(4);
+            dos.writeByte(MESSAGE_TITLE);
             int flags = (title != null ? 1 : 0) | (subtitle != null ? 2 : 0);
             dos.writeByte(flags);
             if (title != null) {
