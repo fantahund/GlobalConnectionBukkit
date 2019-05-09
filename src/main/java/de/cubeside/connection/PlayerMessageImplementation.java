@@ -61,7 +61,7 @@ class PlayerMessageImplementation implements PlayerMessageAPI, Listener {
                     }
                 }
             } catch (IOException ex) {
-                plugin.getLogger().log(Level.SEVERE, "Could not parse MessageAPI message", ex);
+                plugin.getLogger().log(Level.SEVERE, "Could not parse PlayerMessage message", ex);
             }
         }
     }
