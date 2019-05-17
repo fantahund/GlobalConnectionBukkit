@@ -3,6 +3,7 @@ package de.cubeside.connection;
 import com.google.common.base.Preconditions;
 import de.cubeside.connection.event.GlobalDataEvent;
 import de.cubeside.connection.event.GlobalPlayerDisconnectedEvent;
+import de.cubeside.connection.event.GlobalPlayerPropertyChangedEvent;
 import de.cubeside.connection.event.GlobalServerConnectedEvent;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -77,47 +78,47 @@ class PlayerPropertiesImplementation implements PlayerPropertiesAPI, Listener {
         if (e.getChannel().equals(CHANNEL)) {
             DataInputStream dis = new DataInputStream(e.getData());
             try {
-                GlobalPlayer target = e.getTargetPlayer();
-                if (target != null) {
-                    Player player = plugin.getServer().getPlayer(target.getUniqueId());
-                    if (player != null) {
-                        int type = dis.readByte();
-                        if (type == MESSAGE_SET_PROPERTY) {
-                            UUID uuid = readUUID(dis);
-                            String property = dis.readUTF();
-                            String value = dis.readUTF();
+                int type = dis.readByte();
+                if (type == MESSAGE_SET_PROPERTY) {
+                    UUID uuid = readUUID(dis);
+                    GlobalPlayer target = plugin.getConnectionAPI().getPlayer(uuid);
+                    String property = dis.readUTF();
+                    String value = dis.readUTF();
+                    HashMap<String, String> properties = playerProperties.get(uuid);
+                    if (properties == null) {
+                        properties = new HashMap<>();
+                        playerProperties.put(uuid, properties);
+                    }
+                    properties.put(property, value);
+                    plugin.getServer().getPluginManager().callEvent(new GlobalPlayerPropertyChangedEvent(e.getSource(), target, property, value));
+                } else if (type == MESSAGE_DELETE_PROPERTY) {
+                    UUID uuid = readUUID(dis);
+                    GlobalPlayer target = plugin.getConnectionAPI().getPlayer(uuid);
+                    String property = dis.readUTF();
+                    HashMap<String, String> properties = playerProperties.get(uuid);
+                    if (properties != null) {
+                        properties.remove(property);
+                        if (properties.isEmpty()) {
+                            playerProperties.remove(uuid);
+                        }
+                        plugin.getServer().getPluginManager().callEvent(new GlobalPlayerPropertyChangedEvent(e.getSource(), target, property, null));
+                    }
+                } else if (type == MESSAGE_MULTISET_PROPERTIES) {
+                    while (dis.readBoolean()) {
+                        UUID uuid = readUUID(dis);
+                        GlobalPlayer target = plugin.getConnectionAPI().getPlayer(uuid);
+                        int propertiesCount = dis.readInt();
+                        if (propertiesCount > 0) {
                             HashMap<String, String> properties = playerProperties.get(uuid);
                             if (properties == null) {
                                 properties = new HashMap<>();
-                                playerProperties.put(player.getUniqueId(), properties);
+                                playerProperties.put(uuid, properties);
                             }
-                            properties.put(property, value);
-                        } else if (type == MESSAGE_DELETE_PROPERTY) {
-                            UUID uuid = readUUID(dis);
-                            String property = dis.readUTF();
-                            HashMap<String, String> properties = playerProperties.get(uuid);
-                            if (properties != null) {
-                                properties.remove(property);
-                                if (properties.isEmpty()) {
-                                    playerProperties.remove(player.getUniqueId());
-                                }
-                            }
-                        } else if (type == MESSAGE_MULTISET_PROPERTIES) {
-                            while (dis.readBoolean()) {
-                                UUID uuid = readUUID(dis);
-                                int propertiesCount = dis.readInt();
-                                if (propertiesCount > 0) {
-                                    HashMap<String, String> properties = playerProperties.get(uuid);
-                                    if (properties == null) {
-                                        properties = new HashMap<>();
-                                        playerProperties.put(player.getUniqueId(), properties);
-                                    }
-                                    for (int i = 0; i < propertiesCount; i++) {
-                                        String property = dis.readUTF();
-                                        String value = dis.readUTF();
-                                        properties.put(property, value);
-                                    }
-                                }
+                            for (int i = 0; i < propertiesCount; i++) {
+                                String property = dis.readUTF();
+                                String value = dis.readUTF();
+                                properties.put(property, value);
+                                plugin.getServer().getPluginManager().callEvent(new GlobalPlayerPropertyChangedEvent(e.getSource(), target, property, null));
                             }
                         }
                     }
@@ -205,5 +206,6 @@ class PlayerPropertiesImplementation implements PlayerPropertiesAPI, Listener {
             }
             player.sendData(CHANNEL, baos.toByteArray());
         }
+        plugin.getServer().getPluginManager().callEvent(new GlobalPlayerPropertyChangedEvent(plugin.getConnectionAPI().getThisServer(), player, property, null));
     }
 }
