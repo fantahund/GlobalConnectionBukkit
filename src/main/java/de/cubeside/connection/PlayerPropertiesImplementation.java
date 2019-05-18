@@ -182,7 +182,7 @@ class PlayerPropertiesImplementation implements PlayerPropertiesAPI, Listener {
                     } catch (IOException ex) {
                         throw new Error("impossible");
                     }
-                    player.sendData(CHANNEL, baos.toByteArray());
+                    plugin.getConnectionAPI().sendData(CHANNEL, baos.toByteArray());
                 }
             }
         } else { // value != null
@@ -204,8 +204,8 @@ class PlayerPropertiesImplementation implements PlayerPropertiesAPI, Listener {
             } catch (IOException ex) {
                 throw new Error("impossible");
             }
-            player.sendData(CHANNEL, baos.toByteArray());
+            plugin.getConnectionAPI().sendData(CHANNEL, baos.toByteArray());
         }
-        plugin.getServer().getPluginManager().callEvent(new GlobalPlayerPropertyChangedEvent(plugin.getConnectionAPI().getThisServer(), player, property, null));
+        plugin.getServer().getPluginManager().callEvent(new GlobalPlayerPropertyChangedEvent(plugin.getConnectionAPI().getThisServer(), player, property, value));
     }
 }
