@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.logging.Level;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -160,6 +161,7 @@ class PlayerPropertiesImplementation implements PlayerPropertiesAPI, Listener {
 
     @Override
     public void setPropertyValue(GlobalPlayer player, String property, String value) {
+        Preconditions.checkState(Bukkit.isPrimaryThread(), "not on main thread!");
         Preconditions.checkNotNull(player, "player");
         Preconditions.checkNotNull(property, "property");
         Preconditions.checkArgument(player.isOnAnyServer(), "player is not online");
