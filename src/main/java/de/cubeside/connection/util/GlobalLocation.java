@@ -189,7 +189,7 @@ public class GlobalLocation implements ConfigurationSerializable, Comparable<Glo
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("SafeLocation[");
+        builder.append("GlobalLocation[");
         builder.append("server: ").append(this.server);
         builder.append(", ").append("world: ").append(this.world);
         builder.append(", ").append("x: ").append(this.x);
