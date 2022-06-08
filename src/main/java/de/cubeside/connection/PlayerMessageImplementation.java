@@ -56,7 +56,7 @@ class PlayerMessageImplementation implements PlayerMessageAPI, Listener {
                             int fadeInTicks = dis.readInt();
                             int durationTicks = dis.readInt();
                             int fadeOutTicks = dis.readInt();
-                            player.sendTitle(title, subtitle, fadeInTicks, durationTicks, fadeOutTicks);
+                            player.sendTitle((title == null || title.isEmpty()) ? " " : title, (subtitle == null || subtitle.isEmpty()) ? " " : subtitle, fadeInTicks, durationTicks, fadeOutTicks);
                         }
                     }
                 }
@@ -144,7 +144,7 @@ class PlayerMessageImplementation implements PlayerMessageAPI, Listener {
         player.sendData(CHANNEL, baos.toByteArray());
         Player p = plugin.getServer().getPlayer(player.getUniqueId());
         if (p != null) {
-            p.sendTitle(title, subtitle, fadeInTicks, durationTicks, fadeOutTicks);
+            p.sendTitle((title == null || title.isEmpty()) ? " " : title, (subtitle == null || subtitle.isEmpty()) ? " " : subtitle, fadeInTicks, durationTicks, fadeOutTicks);
         }
     }
 
