@@ -119,7 +119,7 @@ class PlayerPropertiesImplementation implements PlayerPropertiesAPI, Listener {
                                 String property = dis.readUTF();
                                 String value = dis.readUTF();
                                 properties.put(property, value);
-                                plugin.getServer().getPluginManager().callEvent(new GlobalPlayerPropertyChangedEvent(e.getSource(), target, property, null));
+                                plugin.getServer().getPluginManager().callEvent(new GlobalPlayerPropertyChangedEvent(e.getSource(), target, property, value));
                             }
                         }
                     }
