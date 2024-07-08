@@ -7,6 +7,7 @@ public abstract class GlobalServerEvent extends Event {
     private final GlobalServer server;
 
     public GlobalServerEvent(GlobalServer server) {
+        super(Type.CUSTOM_EVENT);
         this.server = server;
     }
 

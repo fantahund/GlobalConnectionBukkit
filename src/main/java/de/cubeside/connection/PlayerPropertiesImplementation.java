@@ -2,6 +2,7 @@ package de.cubeside.connection;
 
 import com.google.common.base.Preconditions;
 import de.cubeside.connection.event.GlobalDataEvent;
+import de.cubeside.connection.event.GlobalDataListener;
 import de.cubeside.connection.event.GlobalPlayerDisconnectedEvent;
 import de.cubeside.connection.event.GlobalPlayerPropertyChangedEvent;
 import de.cubeside.connection.event.GlobalServerConnectedEvent;
@@ -15,12 +16,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.logging.Level;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 
-class PlayerPropertiesImplementation implements PlayerPropertiesAPI, Listener {
+import de.iani.playerUUIDCache.CachedPlayer;
+import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
+
+class PlayerPropertiesImplementation extends GlobalDataListener implements PlayerPropertiesAPI {
 
     private final static int MESSAGE_SET_PROPERTY = 1;
     private final static int MESSAGE_DELETE_PROPERTY = 2;
@@ -35,17 +36,15 @@ class PlayerPropertiesImplementation implements PlayerPropertiesAPI, Listener {
     public PlayerPropertiesImplementation(GlobalClientPlugin plugin) {
         this.plugin = plugin;
         this.playerProperties = new HashMap<>();
-        plugin.getServer().getPluginManager().registerEvents(this, plugin);
+        plugin.getServer().getPluginManager().registerEvent(Event.Type.CUSTOM_EVENT, this, Event.Priority.Normal, plugin);
     }
 
-    @EventHandler
     public void onGlobalPlayerDisconnected(GlobalPlayerDisconnectedEvent e) {
         if (e.hasJustLeftTheNetwork()) {
             playerProperties.remove(e.getPlayer().getUniqueId());
         }
     }
 
-    @EventHandler
     public void onGlobalServerConnected(GlobalServerConnectedEvent e) {
         // send all properties
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -53,16 +52,19 @@ class PlayerPropertiesImplementation implements PlayerPropertiesAPI, Listener {
         try {
             dos.writeByte(MESSAGE_MULTISET_PROPERTIES);
             for (Player p : plugin.getServer().getOnlinePlayers()) {
-                UUID uuid = p.getUniqueId();
-                HashMap<String, String> properties = playerProperties.get(uuid);
-                if (properties != null) {
-                    dos.writeBoolean(true);
-                    dos.writeLong(uuid.getMostSignificantBits());
-                    dos.writeLong(uuid.getLeastSignificantBits());
-                    dos.writeInt(properties.size());
-                    for (Entry<String, String> entry : properties.entrySet()) {
-                        dos.writeUTF(entry.getKey());
-                        dos.writeUTF(entry.getValue());
+                CachedPlayer cp = plugin.playerUUIDCache.getPlayer(p.getName());
+                if (cp != null) {
+                    UUID uuid = cp.getUUID();
+                    HashMap<String, String> properties = playerProperties.get(uuid);
+                    if (properties != null) {
+                        dos.writeBoolean(true);
+                        dos.writeLong(uuid.getMostSignificantBits());
+                        dos.writeLong(uuid.getLeastSignificantBits());
+                        dos.writeInt(properties.size());
+                        for (Entry<String, String> entry : properties.entrySet()) {
+                            dos.writeUTF(entry.getKey());
+                            dos.writeUTF(entry.getValue());
+                        }
                     }
                 }
             }
@@ -74,7 +76,6 @@ class PlayerPropertiesImplementation implements PlayerPropertiesAPI, Listener {
         e.getServer().sendData(CHANNEL, baos.toByteArray());
     }
 
-    @EventHandler
     public void onGlobalData(GlobalDataEvent e) {
         if (e.getChannel().equals(CHANNEL)) {
             DataInputStream dis = new DataInputStream(e.getData());
@@ -161,7 +162,7 @@ class PlayerPropertiesImplementation implements PlayerPropertiesAPI, Listener {
 
     @Override
     public void setPropertyValue(GlobalPlayer player, String property, String value) {
-        Preconditions.checkState(Bukkit.isPrimaryThread(), "not on main thread!");
+        Preconditions.checkState(plugin.isPrimaryThread(), "not on main thread!");
         Preconditions.checkNotNull(player, "player");
         Preconditions.checkNotNull(property, "property");
         Preconditions.checkArgument(player.isOnAnyServer(), "player is not online");

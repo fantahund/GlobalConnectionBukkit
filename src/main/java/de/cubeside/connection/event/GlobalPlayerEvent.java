@@ -9,6 +9,7 @@ public abstract class GlobalPlayerEvent extends Event {
     private final GlobalPlayer player;
 
     public GlobalPlayerEvent(GlobalServer server, GlobalPlayer player) {
+        super(Type.CUSTOM_EVENT);
         this.server = server;
         this.player = player;
     }

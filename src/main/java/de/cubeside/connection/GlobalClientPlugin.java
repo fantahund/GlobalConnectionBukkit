@@ -1,21 +1,34 @@
 package de.cubeside.connection;
 
-import de.cubeside.connection.util.GlobalLocation;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.serialization.ConfigurationSerialization;
-import org.bukkit.plugin.ServicePriority;
+import de.iani.playerUUIDCache.PlayerUUIDCache;
+import org.bukkit.Server;
+import org.bukkit.plugin.PluginDescriptionFile;
+import org.bukkit.plugin.PluginLoader;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.io.File;
+import java.util.logging.Logger;
 
 public class GlobalClientPlugin extends JavaPlugin {
     private GlobalClientBukkit globalClient;
     private PlayerMessageAPI messageAPI;
     private PlayerPropertiesAPI propertiesAPI;
+    private Logger logger;
+    private static Thread mainThead;
+    public PlayerUUIDCache playerUUIDCache;
+
+    public GlobalClientPlugin(PluginLoader pluginLoader, Server instance, PluginDescriptionFile desc, File folder, File plugin, ClassLoader cLoader) {
+        super(pluginLoader, instance, desc, folder, plugin, cLoader);
+    }
 
     @Override
     public void onEnable() {
-        saveDefaultConfig();
-        ConfigurationSerialization.registerClass(GlobalLocation.class);
+        mainThead = Thread.currentThread();
+        logger = Logger.getLogger("GlobalClient");
+        getConfiguration().load();
+
+        playerUUIDCache = (PlayerUUIDCache) this.getServer().getPluginManager().getPlugin("PlayerUUIDCache");
+
         globalClient = new GlobalClientBukkit(this);
         reconnectClient();
         getServer().getServicesManager().register(ConnectionAPI.class, globalClient, this, ServicePriority.Normal);
@@ -37,21 +50,11 @@ public class GlobalClientPlugin extends JavaPlugin {
         propertiesAPI = null;
     }
 
-    @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!sender.hasPermission("globalclient.reload")) {
-            return false;
-        }
-        reloadConfig();
-        reconnectClient();
-        return true;
-    }
-
     public void reconnectClient() {
-        String account = getConfig().getString("client.account");
-        String password = getConfig().getString("client.password");
-        String host = getConfig().getString("server.host");
-        int port = getConfig().getInt("server.port");
+        String account = getConfiguration().getString("client.account");
+        String password = getConfiguration().getString("client.password");
+        String host = getConfiguration().getString("server.host");
+        int port = getConfiguration().getInt("server.port", 25701);
         globalClient.setServer(host, port, account, password);
     }
 
@@ -59,11 +62,15 @@ public class GlobalClientPlugin extends JavaPlugin {
         return globalClient;
     }
 
-    public PlayerMessageAPI getMessageAPI() {
-        return messageAPI;
+    public Logger getLogger() {
+        return logger;
     }
 
-    public PlayerPropertiesAPI getPlayerPropertiesAPI() {
-        return propertiesAPI;
+    public boolean isPrimaryThread() {
+        return mainThead.equals(Thread.currentThread());
+    }
+
+    public PlayerUUIDCache getPlayerUUIDCache() {
+        return playerUUIDCache;
     }
 }

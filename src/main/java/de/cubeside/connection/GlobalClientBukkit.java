@@ -5,12 +5,12 @@ import de.cubeside.connection.event.GlobalPlayerDisconnectedEvent;
 import de.cubeside.connection.event.GlobalPlayerJoinedEvent;
 import de.cubeside.connection.event.GlobalServerConnectedEvent;
 import de.cubeside.connection.event.GlobalServerDisconnectedEvent;
+import de.iani.playerUUIDCache.CachedPlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
+import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerEvent;
+import org.bukkit.event.player.PlayerListener;
 
 class GlobalClientBukkit extends GlobalClient implements Listener {
     private final GlobalClientPlugin plugin;
@@ -19,21 +19,24 @@ class GlobalClientBukkit extends GlobalClient implements Listener {
     public GlobalClientBukkit(GlobalClientPlugin connectionPlugin) {
         super(connectionPlugin.getLogger());
         plugin = connectionPlugin;
-        plugin.getServer().getPluginManager().registerEvents(this, plugin);
+        plugin.getServer().getPluginManager().registerEvent(Event.Type.PLAYER_JOIN, new GlobalCLientListener(), Event.Priority.Normal, plugin);
     }
 
     @Override
     public void setServer(String host, int port, String account, String password) {
         super.setServer(host, port, account, password);
         for (Player p : plugin.getServer().getOnlinePlayers()) {
-            onPlayerOnline(p.getUniqueId(), p.getName(), System.currentTimeMillis());
+            CachedPlayer cp = plugin.playerUUIDCache.getPlayer(p.getName());
+            if (cp != null) {
+                onPlayerOnline(cp.getUniqueId(), p.getName(), System.currentTimeMillis());
+            }
         }
     }
 
     @Override
     protected void runInMainThread(Runnable r) {
         if (!stoppingServer) {
-            plugin.getServer().getScheduler().runTask(plugin, r);
+            plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, r);
         }
     }
 
@@ -42,15 +45,23 @@ class GlobalClientBukkit extends GlobalClient implements Listener {
         plugin.getServer().getPluginManager().callEvent(new GlobalDataEvent(source, targetPlayer, channel, data));
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onPlayerJoin(PlayerJoinEvent e) {
-        onPlayerOnline(e.getPlayer().getUniqueId(), e.getPlayer().getName(), System.currentTimeMillis());
+    class GlobalCLientListener extends PlayerListener {
+        public void onPlayerJoin(PlayerEvent e) {
+            CachedPlayer cp = plugin.playerUUIDCache.getPlayer(e.getPlayer().getName());
+            if (cp != null) {
+                onPlayerOnline(cp.getUniqueId(), e.getPlayer().getName(), System.currentTimeMillis());
+            }
+
+        }
+
+        public void onPlayerQuit(PlayerEvent e) {
+            CachedPlayer cp = plugin.playerUUIDCache.getPlayer(e.getPlayer().getName());
+            if (cp != null) {
+                onPlayerOffline(cp.getUniqueId());
+            }
+        }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onPlayerQuit(PlayerQuitEvent e) {
-        onPlayerOffline(e.getPlayer().getUniqueId());
-    }
 
     @Override
     protected void onPlayerJoined(GlobalServer server, GlobalPlayer player, boolean joinedTheNetwork) {
