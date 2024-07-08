@@ -17,9 +17,11 @@ public class GlobalClientPlugin extends JavaPlugin {
     private Logger logger;
     private static Thread mainThead;
     public PlayerUUIDCache playerUUIDCache;
+    private static GlobalClientPlugin instance;
 
     public GlobalClientPlugin(PluginLoader pluginLoader, Server instance, PluginDescriptionFile desc, File folder, File plugin, ClassLoader cLoader) {
         super(pluginLoader, instance, desc, folder, plugin, cLoader);
+        this.instance = instance;
     }
 
     @Override
@@ -88,5 +90,9 @@ public class GlobalClientPlugin extends JavaPlugin {
 
     public PlayerUUIDCache getPlayerUUIDCache() {
         return playerUUIDCache;
+    }
+    
+    public static GlobalClientPlugin getInstance() {
+        return instance;
     }
 }
