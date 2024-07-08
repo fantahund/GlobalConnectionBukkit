@@ -5,6 +5,7 @@ import org.bukkit.Server;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginLoader;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.util.config.Configuration;
 
 import java.io.File;
 import java.util.logging.Logger;
@@ -25,19 +26,30 @@ public class GlobalClientPlugin extends JavaPlugin {
     public void onEnable() {
         mainThead = Thread.currentThread();
         logger = Logger.getLogger("GlobalClient");
+        getConfiguration().save();
         getConfiguration().load();
+        if (getConfiguration().getString("client.account") == null) {
+            Configuration config = getConfiguration();
+            config.setProperty("client.account", "CHANGEME");
+            config.setProperty("client.password", "CHANGEME");
+            config.setProperty("server.host", "localhost");
+            config.setProperty("server.port", "25701");
+            config.save();
+            getConfiguration().load();
+        }
+
 
         playerUUIDCache = (PlayerUUIDCache) this.getServer().getPluginManager().getPlugin("PlayerUUIDCache");
 
         globalClient = new GlobalClientBukkit(this);
         reconnectClient();
-        getServer().getServicesManager().register(ConnectionAPI.class, globalClient, this, ServicePriority.Normal);
+        //TODO REGISTER getServer().getServicesManager().register(ConnectionAPI.class, globalClient, this, ServicePriority.Normal);
 
         messageAPI = new PlayerMessageImplementation(this);
-        getServer().getServicesManager().register(PlayerMessageAPI.class, messageAPI, this, ServicePriority.Normal);
+        //TODO REGISTER getServer().getServicesManager().register(PlayerMessageAPI.class, messageAPI, this, ServicePriority.Normal);
 
         propertiesAPI = new PlayerPropertiesImplementation(this);
-        getServer().getServicesManager().register(PlayerPropertiesAPI.class, propertiesAPI, this, ServicePriority.Normal);
+        //TODO REGISTER getServer().getServicesManager().register(PlayerPropertiesAPI.class, propertiesAPI, this, ServicePriority.Normal);
     }
 
     @Override
@@ -55,6 +67,10 @@ public class GlobalClientPlugin extends JavaPlugin {
         String password = getConfiguration().getString("client.password");
         String host = getConfiguration().getString("server.host");
         int port = getConfiguration().getInt("server.port", 25701);
+        System.out.println(account);
+        System.out.println(password);
+        System.out.println(host);
+        System.out.println(port);
         globalClient.setServer(host, port, account, password);
     }
 
