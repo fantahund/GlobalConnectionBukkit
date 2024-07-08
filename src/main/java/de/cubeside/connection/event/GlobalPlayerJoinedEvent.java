@@ -7,7 +7,7 @@ public class GlobalPlayerJoinedEvent extends GlobalPlayerEvent {
     private final boolean joinedTheNetwork;
 
     public GlobalPlayerJoinedEvent(GlobalServer server, GlobalPlayer player, boolean joinedTheNetwork) {
-        super(server, player);
+        super("GlobalPlayerJoinedEvent", server, player);
         this.joinedTheNetwork = joinedTheNetwork;
     }
 

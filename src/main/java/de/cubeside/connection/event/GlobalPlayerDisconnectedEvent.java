@@ -7,7 +7,7 @@ public class GlobalPlayerDisconnectedEvent extends GlobalPlayerEvent {
     private final boolean leftTheNetwork;
 
     public GlobalPlayerDisconnectedEvent(GlobalServer server, GlobalPlayer player, boolean leftTheNetwork) {
-        super(server, player);
+        super("GlobalPlayerDisconnectedEvent", server, player);
         this.leftTheNetwork = leftTheNetwork;
     }
 

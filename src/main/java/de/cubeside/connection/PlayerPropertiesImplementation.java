@@ -19,6 +19,7 @@ import java.util.logging.Level;
 
 import de.iani.playerUUIDCache.CachedPlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.event.CustomEventListener;
 import org.bukkit.event.Event;
 
 class PlayerPropertiesImplementation extends GlobalDataListener implements PlayerPropertiesAPI {

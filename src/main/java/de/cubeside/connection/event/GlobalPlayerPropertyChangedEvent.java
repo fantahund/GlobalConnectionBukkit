@@ -8,7 +8,7 @@ public class GlobalPlayerPropertyChangedEvent extends GlobalPlayerEvent {
     private final String value;
 
     public GlobalPlayerPropertyChangedEvent(GlobalServer server, GlobalPlayer player, String property, String value) {
-        super(server, player);
+        super("GlobalPlayerPropertyChangedEvent", server, player);
         this.property = property;
         this.value = value;
     }

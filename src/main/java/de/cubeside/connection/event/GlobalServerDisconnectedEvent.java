@@ -5,6 +5,6 @@ import de.cubeside.connection.GlobalServer;
 public class GlobalServerDisconnectedEvent extends GlobalServerEvent {
 
     public GlobalServerDisconnectedEvent(GlobalServer server) {
-        super(server);
+        super("GlobalServerDisconnectedEvent", server);
     }
 }

@@ -10,9 +10,10 @@ import java.util.logging.Level;
 
 import de.cubeside.connection.event.GlobalDataListener;
 import org.bukkit.entity.Player;
+import org.bukkit.event.CustomEventListener;
 import org.bukkit.event.Event;
 
-class PlayerMessageImplementation extends GlobalDataListener implements PlayerMessageAPI {
+class PlayerMessageImplementation extends CustomEventListener implements PlayerMessageAPI {
 
     private final static int MESSAGE_CHAT = 1;
 
@@ -26,7 +27,7 @@ class PlayerMessageImplementation extends GlobalDataListener implements PlayerMe
     }
 
 
-    public void onGlobalData(GlobalDataEvent e) {
+    public void onCustomEvent(GlobalDataEvent e) {
         if (e.getChannel().equals(CHANNEL)) {
             DataInputStream dis = new DataInputStream(e.getData());
             try {

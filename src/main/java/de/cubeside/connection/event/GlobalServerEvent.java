@@ -6,8 +6,8 @@ import org.bukkit.event.Event;
 public abstract class GlobalServerEvent extends Event {
     private final GlobalServer server;
 
-    public GlobalServerEvent(GlobalServer server) {
-        super(Type.CUSTOM_EVENT);
+    public GlobalServerEvent(String event, GlobalServer server) {
+        super(event);
         this.server = server;
     }
 

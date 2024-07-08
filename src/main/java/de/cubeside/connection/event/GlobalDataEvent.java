@@ -14,7 +14,7 @@ public class GlobalDataEvent extends Event {
     private final byte[] data;
 
     public GlobalDataEvent(GlobalServer source, GlobalPlayer targetPlayer, String channel, byte[] data) {
-        super(Type.CUSTOM_EVENT);
+        super("GlobalDataEvent");
         this.source = source;
         this.targetPlayer = targetPlayer;
         this.channel = channel;
