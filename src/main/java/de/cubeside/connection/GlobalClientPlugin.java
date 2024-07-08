@@ -21,7 +21,7 @@ public class GlobalClientPlugin extends JavaPlugin {
 
     public GlobalClientPlugin(PluginLoader pluginLoader, Server instance, PluginDescriptionFile desc, File folder, File plugin, ClassLoader cLoader) {
         super(pluginLoader, instance, desc, folder, plugin, cLoader);
-        this.instance = instance;
+        GlobalClientPlugin.instance = this;
     }
 
     @Override
@@ -94,5 +94,13 @@ public class GlobalClientPlugin extends JavaPlugin {
     
     public static GlobalClientPlugin getInstance() {
         return instance;
+    }
+
+    public PlayerMessageAPI getMessageAPI() {
+        return messageAPI;
+    }
+
+    public PlayerPropertiesAPI getPropertiesAPI() {
+        return propertiesAPI;
     }
 }
