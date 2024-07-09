@@ -29,7 +29,6 @@ class GlobalClientBukkit extends GlobalClient implements Listener {
         for (Player p : plugin.getServer().getOnlinePlayers()) {
             CachedPlayer cp = plugin.playerUUIDCache.getPlayerFromNameOrUUID(p.getName(), true);
             if (cp != null) {
-                System.out.println(cp.getName() + " " + cp.getUniqueId().toString());
                 onPlayerOnline(cp.getUniqueId(), p.getName(), System.currentTimeMillis());
             }
         }
@@ -51,17 +50,13 @@ class GlobalClientBukkit extends GlobalClient implements Listener {
         public void onPlayerJoin(PlayerEvent e) {
             CachedPlayer cp = plugin.playerUUIDCache.getPlayerFromNameOrUUID(e.getPlayer().getName(), true);
             if (cp != null) {
-                System.out.println(cp.getName() + " " + cp.getUniqueId().toString());
                 onPlayerOnline(cp.getUniqueId(), e.getPlayer().getName(), System.currentTimeMillis());
             }
-
         }
 
         public void onPlayerQuit(PlayerEvent e) {
-            System.out.println("Player " + e.getPlayer() + " quit!");
             CachedPlayer cp = plugin.playerUUIDCache.getPlayerFromNameOrUUID(e.getPlayer().getName(), true);
             if (cp != null) {
-                System.out.println(cp.getName() + " " + cp.getUniqueId().toString());
                 onPlayerOffline(cp.getUniqueId());
             }
         }
