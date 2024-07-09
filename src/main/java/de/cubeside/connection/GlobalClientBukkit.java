@@ -20,14 +20,16 @@ class GlobalClientBukkit extends GlobalClient implements Listener {
         super(connectionPlugin.getLogger());
         plugin = connectionPlugin;
         plugin.getServer().getPluginManager().registerEvent(Event.Type.PLAYER_JOIN, new GlobalCLientListener(), Event.Priority.Normal, plugin);
+        plugin.getServer().getPluginManager().registerEvent(Event.Type.PLAYER_QUIT, new GlobalCLientListener(), Event.Priority.Normal, plugin);
     }
 
     @Override
     public void setServer(String host, int port, String account, String password) {
         super.setServer(host, port, account, password);
         for (Player p : plugin.getServer().getOnlinePlayers()) {
-            CachedPlayer cp = plugin.playerUUIDCache.getPlayer(p.getName());
+            CachedPlayer cp = plugin.playerUUIDCache.getPlayerFromNameOrUUID(p.getName(), true);
             if (cp != null) {
+                System.out.println(cp.getName() + " " + cp.getUniqueId().toString());
                 onPlayerOnline(cp.getUniqueId(), p.getName(), System.currentTimeMillis());
             }
         }
@@ -47,16 +49,19 @@ class GlobalClientBukkit extends GlobalClient implements Listener {
 
     class GlobalCLientListener extends PlayerListener {
         public void onPlayerJoin(PlayerEvent e) {
-            CachedPlayer cp = plugin.playerUUIDCache.getPlayer(e.getPlayer().getName());
+            CachedPlayer cp = plugin.playerUUIDCache.getPlayerFromNameOrUUID(e.getPlayer().getName(), true);
             if (cp != null) {
+                System.out.println(cp.getName() + " " + cp.getUniqueId().toString());
                 onPlayerOnline(cp.getUniqueId(), e.getPlayer().getName(), System.currentTimeMillis());
             }
 
         }
 
         public void onPlayerQuit(PlayerEvent e) {
-            CachedPlayer cp = plugin.playerUUIDCache.getPlayer(e.getPlayer().getName());
+            System.out.println("Player " + e.getPlayer() + " quit!");
+            CachedPlayer cp = plugin.playerUUIDCache.getPlayerFromNameOrUUID(e.getPlayer().getName(), true);
             if (cp != null) {
+                System.out.println(cp.getName() + " " + cp.getUniqueId().toString());
                 onPlayerOffline(cp.getUniqueId());
             }
         }

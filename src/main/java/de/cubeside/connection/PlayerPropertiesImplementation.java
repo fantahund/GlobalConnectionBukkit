@@ -53,7 +53,7 @@ class PlayerPropertiesImplementation extends GlobalDataListener implements Playe
         try {
             dos.writeByte(MESSAGE_MULTISET_PROPERTIES);
             for (Player p : plugin.getServer().getOnlinePlayers()) {
-                CachedPlayer cp = plugin.playerUUIDCache.getPlayer(p.getName());
+                CachedPlayer cp = plugin.playerUUIDCache.getPlayerFromNameOrUUID(p.getName(), true);
                 if (cp != null) {
                     UUID uuid = cp.getUUID();
                     HashMap<String, String> properties = playerProperties.get(uuid);
